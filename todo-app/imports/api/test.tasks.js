@@ -8,8 +8,21 @@ import { Tasks } from './tasks.js'
 if (Meteor.isServer) {
     describe('Tasks', () => {
         describe('methods', () => {
-            const userId = Random.id()
-            let taskId;
+            const username = 'larry'
+            let taskId, userId;
+            before(() => {
+                let user = Meteor.users.findOne({ username: username });
+                if (!user) {
+                    userId = Accounts.createUser({
+                        'username': username,
+                        'email': 'a@gmail.com',
+                        'password': '12345578',
+                    });
+                } else {
+                    userId = user._id;
+                }
+
+            });
             beforeEach(() => {
                 Tasks.remove({});
                 taskId = Tasks.insert({
@@ -32,8 +45,72 @@ if (Meteor.isServer) {
 
                 // Verify that the method does what we expected
                 assert.equal(Tasks.find().count(), 0);
-            }),
-            it('can insert task', () =>{
+            })
+            it('can insert task', () => {
+                const insertTask = Meteor.server.method_handlers['tasks.insert'];
+                const invocation = { userId }
+                insertTask.apply(invocation, ['hello mest']);
+                assert.equal(Tasks.find().count(), 2);
+
+            })
+            it('cannot insert task if not logged in',()=>{
+                const insertTask = Meteor.server.method_handlers['tasks.insert'];
+                const invocation = { }
+                
+                assert.throws(()=>{
+                    insertTask.apply(invocation, ['hello mest']);
+                }, Meteor.Error, 'not-authorized')
+                assert.equal(Tasks.find().count(), 1);
+
+            })
+            it('cannot delete someone else task',()=>{
+                Tasks.update(taskId, { $set: { private: true } });
+                const deleteTask = Meteor.server.method_handlers['tasks.remove'];
+                const userId = Random.id();
+                const invocation = { userId }
+                
+                assert.throws(()=>{
+                    deleteTask.apply(invocation, [taskId]);
+                }, Meteor.Error, 'not-authorized')
+                assert.equal(Tasks.find().count(), 1);
+                
+            })
+            it('can set own task private',()=>{
+                const setPrivate = Meteor.server.method_handlers['tasks.setPrivate'];
+                const invocation = { userId }               
+                setPrivate.apply(invocation, [taskId, true]);
+                assert.equal(Tasks.find({private:true}).count(), 1);
+                
+            })
+            it('cannot set someone else task private',()=>{
+                Tasks.update(taskId, { $set: { private: true } });
+                const setPrivate = Meteor.server.method_handlers['tasks.setPrivate']
+                const userId = Random.id();
+                const invocation = { userId }
+                
+                assert.throws(()=>{
+                    setPrivate.apply(invocation, [taskId, true]);
+                }, Meteor.Error, 'not-authorized')
+                assert.equal(Tasks.find({private:true}).count(), 1);
+                
+            })
+            it('can set own task checked',()=>{
+                const setChecked = Meteor.server.method_handlers['tasks.setChecked'];
+                const invocation = { userId }               
+                setChecked.apply(invocation, [taskId, true]);
+                assert.equal(Tasks.find({checked:true}).count(), 1);
+                
+            })
+            it('cannot set someone else task checked',()=>{
+                Tasks.update(taskId, { $set: { private: true } });
+                const setChecked = Meteor.server.method_handlers['tasks.setChecked'];
+                const userId = Random.id();
+                const invocation = { userId }
+                
+                assert.throws(()=>{              
+                    setChecked.apply(invocation, [taskId, true]);
+                }, Meteor.Error, 'not-authorized')
+                assert.equal(Tasks.find({checked:true}).count(), 0);
                 
             })
         })
