@@ -1,4 +1,5 @@
 import assert from "assert";
+import "../imports/api/test.tasks.js";
 
 describe("todo-app", function () {
   it("package.json has correct name", async function () {
