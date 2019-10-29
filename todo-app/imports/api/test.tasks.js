@@ -15,7 +15,7 @@ if (Meteor.isServer) {
                 if (!user) {
                     userId = Accounts.createUser({
                         'username': username,
-                        'email': 'a@gmail.com',
+                        'email': 'larry@gmail.com',
                         'password': '12345578',
                     });
                 } else {
@@ -59,7 +59,7 @@ if (Meteor.isServer) {
                 
                 assert.throws(()=>{
                     insertTask.apply(invocation, ['hello mest']);
-                }, Meteor.Error, 'not-authorized')
+                }, Meteor.Error, 'Insert not authorized')
                 assert.equal(Tasks.find().count(), 1);
 
             })
@@ -71,7 +71,7 @@ if (Meteor.isServer) {
                 
                 assert.throws(()=>{
                     deleteTask.apply(invocation, [taskId]);
-                }, Meteor.Error, 'not-authorized')
+                }, Meteor.Error, 'You are not allowed to delete this')
                 assert.equal(Tasks.find().count(), 1);
                 
             })
@@ -90,7 +90,7 @@ if (Meteor.isServer) {
                 
                 assert.throws(()=>{
                     setPrivate.apply(invocation, [taskId, true]);
-                }, Meteor.Error, 'not-authorized')
+                }, Meteor.Error, 'You cannot set this to private')
                 assert.equal(Tasks.find({private:true}).count(), 1);
                 
             })
@@ -109,7 +109,7 @@ if (Meteor.isServer) {
                 
                 assert.throws(()=>{              
                     setChecked.apply(invocation, [taskId, true]);
-                }, Meteor.Error, 'not-authorized')
+                }, Meteor.Error, 'You are not allowed to check this')
                 assert.equal(Tasks.find({checked:true}).count(), 0);
                 
             })

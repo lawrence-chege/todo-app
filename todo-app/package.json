@@ -5,7 +5,9 @@
     "start": "meteor run",
     "test": "meteor test --once --driver-package meteortesting:mocha",
     "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
-    "visualize": "meteor --production --extra-packages bundle-visualizer"
+    "visualize": "meteor --production --extra-packages bundle-visualizer",
+    "coverage:unit": "BABEL_ENV=COVERAGE TEST_BROWSER_DRIVER=puppeteer COVERAGE=1 COVERAGE_OUT_HTML=1 COVERAGE_APP_FOLDER=$PWD/ meteor test --once --driver-package meteortesting:mocha",
+    "coverage:watch": "BABEL_ENV=COVERAGE COVERAGE=1 COVERAGE_VERBOSE=1 COVERAGE_APP_FOLDER=$PWD/ TEST_WATCH=1 meteor test --driver-package meteortesting:mocha"
   },
   "dependencies": {
     "@babel/runtime": "^7.3.4",
@@ -22,6 +24,26 @@
     "testModule": "tests/main.js"
   },
   "devDependencies": {
+    "babel-plugin-istanbul": "^5.2.0",
     "chai": "^4.2.0"
-  }
+  },
+  "version": "1.0.0",
+  "description": "Task management",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/lawrence-chege/todo-app.git"
+  },
+  "keywords": [
+    "tasks"
+  ],
+  "author": "Lawrence Chege",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lawrence-chege/todo-app/issues"
+  },
+  "homepage": "https://github.com/lawrence-chege/todo-app#readme"
 }
